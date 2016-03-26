@@ -1,0 +1,21 @@
+{
+  "name": "quotacle-cdn-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "start.js",
+  "scripts": {
+    "start": "node ./server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wmsmacdonald/quotacle-cdn-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wmsmacdonald/quotacle-cdn-server/issues"
+  },
+  "homepage": "https://github.com/wmsmacdonald/quotacle-cdn-server#readme",
+  "dependencies": {}
+}
