@@ -6,7 +6,7 @@ var path = require('path');
 var HOST = '127.0.0.1';
 var PORT = 5340;
 
-var password = fs.readFileSync(path.join(__dirname, 'secrets/asset_generator_password.conf')).toString().split('\n')[0];
+var acceptedApiKeys = require('./secrets/accepted_api_keys');
 
 // Create a server instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection' event
@@ -22,7 +22,7 @@ net.createServer(function(sock) {
   sock.on('data', function(data) {
     if (initialSetup) {
       console.log('Password given: "%s"', data);
-      if (data != password) {
+      if (acceptedApiKeys.indexOf(data.toString()) < 0) {
         sock.write(JSON.stringify({
           authSuccess: false
         }));
@@ -37,19 +37,22 @@ net.createServer(function(sock) {
       return;
     }
 
-    console.log('DATA ' + sock.remoteAddress + ': ' + data);
     data = JSON.parse(data);
+    var message = data.message;
 
-    if (data.action === 'createThumbnail') {
-      ffmpeg('/usr/bin/ffmpeg -i ' + data.file + ' -ss ' + data.startTime + ' -to ' + data.endTime + ' vframes 1 output.jpg', function() {
+    if (message.action.toString() === 'createThumbnail') {
+      ffmpeg('/usr/bin/ffmpeg  -ss ' + message.timeOffset + ' -i ' + message.file + ' -frames:v 1 output.jpg', function() {
+        console.log('success, calling back');
         sock.write(JSON.stringify({
           requestId: data.requestId,
-          data_uri: 'testasdjflkasjkdljfklsadjlkfjalksjdklfjksdjklf'
+          message: {
+            data_uri: 'testasdjflkasjkdljfklsadjlkfjalksjdklfjksdjklf'
+          }
         }));
       });
     }
     else if (data.action === 'createVideoClip') {
-
+      throw 'createVideoClip not yet implemented';
     }
 
     // Write the data back to the socket, the client will receive it as data from the server
@@ -66,6 +69,7 @@ net.createServer(function(sock) {
 
 function ffmpeg(command, callback) {
   console.log('pretending to execute ' + command);
+  callback();
 }
 
 console.log('Server listening on ' + HOST +':'+ PORT);
