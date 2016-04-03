@@ -13,6 +13,7 @@ var PORT = 5340;
 var acceptedApiKeys = require('./conf/secrets/accepted_api_keys');
 var paths = require('./conf/paths');
 var ffmpegPath = require('./conf/ffmpeg_path');
+var wwwHost = require('./conf/www_host');
 
 
 // Create a server instance, and chain the listen function to it
@@ -59,19 +60,27 @@ net.createServer(function(sock) {
         + ' -frames:v 1'
         + ' ' + outputFile;
 
-      console.log(command);
-
-      /*processQueue.add(command, function() {
-        console.log('success, calling back');
-        sock.write(JSON.stringify({
-          requestId: data.requestId,
-          message: {
-            data_uri: 'testasdjflkasjkdljfklsadjlkfjalksjdklfjksdjklf'
-          }
-        }));
-      });*/
+      processQueue.add(command, function(err) {
+        if (err) {
+          sock.write(JSON.stringify({
+            requestId: data.requestId,
+            message: {
+              err: 'FFmpeg command failed: ' + command
+            }
+          }));
+        }
+        else {
+          var url = "http://" + wwwHost + '/thumbnails/' + path.basename(outputFile);
+          sock.write(JSON.stringify({
+            requestId: data.requestId,
+            message: {
+              url: url
+            }
+          }));
+        }
+      });
     }
-    else if (data.action === 'createVideoClip') {
+    else if (message.action.toString() === 'createVideoClip') {
       throw 'createVideoClip not yet implemented';
     }
 

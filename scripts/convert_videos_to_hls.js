@@ -11,7 +11,7 @@ movies = movies.map(function(line) {
 });
 
 var videosPath = '/data/quotacle/movies';
-var hlsPath = '/data/quotacle/assets/videos/movies';
+var hlsPath = '/data/quotacle/assets/movies';
 
 var numProcesses = 0;
 var numCores = 4;

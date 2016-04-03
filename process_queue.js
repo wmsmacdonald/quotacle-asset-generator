@@ -15,9 +15,15 @@ module.exports = {
 function tryToExecuteNext() {
   if (numProcesses < numCores && queue.length > 0) {
     var processItem = queue.shift();
-    process.exec(processItem.command, function(err, stdout) {
-      if (err) processItem.callback(err);
+    console.log(processItem.command);
 
+    process.exec(processItem.command, function(err, stdout) {
+      if (err) {
+        processItem.callback(err);
+      }
+      else {
+        processItem.callback(false);
+      }
       numProcesses--;
       tryToExecuteNext();
     });
