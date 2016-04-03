@@ -10,8 +10,8 @@ movies = movies.map(function(line) {
     return { id: fields[0], cleanfile: fields[1] } 
 });
 
-var videosPath = '/data/quotacle-old/videofiles';
-var hlsPath = '/data/quotacle-cdn-server/assets/videos/movies';
+var videosPath = '/data/quotacle/movies';
+var hlsPath = '/data/quotacle/assets/videos/movies';
 
 var numProcesses = 0;
 var numCores = 4;
@@ -21,12 +21,12 @@ for (var i = 0; i < movies.length; i++) {
     
     var inputVideoPath = path.join(videosPath, movies[i].cleanfile + '.mp4');
 
-    var outputPath = path.join(hlsPath, movies[i].id + '.mp4');
+    var outputPath = path.join(hlsPath, movies[i].id);
     fs.mkdirSync(outputPath);
     //var outputVideoPath = path.join(outputPath, 'index.m3u8');
     //var command = '/usr/bin/ffmpeg -i ' + inputVideoPath
         //+ ' -hls_time 1 -hls_list_size 0 ' + outputVideoPath;
-    var command = 'mv ' + inputVideoPath + ' ' + outputPath;  
+    var command = 'mv ' + inputVideoPath + ' ' + path.join(outputPath, 'full.mp4');  
     processQueue.push(command); 
     executeNext();
 }
