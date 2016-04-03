@@ -17,7 +17,8 @@ function tryToExecuteNext() {
     var processItem = queue.shift();
     console.log(processItem.command);
 
-    process.exec(processItem.command, function(err, stdout) {
+    process.exec(processItem.command, function(err, stdout, stderr) {
+      //console.log(JSON.stringify(err));
       if (err) {
         processItem.callback(err);
       }

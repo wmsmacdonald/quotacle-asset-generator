@@ -21,7 +21,6 @@ var wwwHost = require('./conf/www_host');
 // The sock object the callback function receives UNIQUE for each connection
 net.createServer(function(sock) {
 
-  // We have a connection - a socket object is assigned to the connection automatically
   console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
 
   var initialSetup = true;
@@ -62,10 +61,11 @@ net.createServer(function(sock) {
 
       processQueue.add(command, function(err) {
         if (err) {
+          console.log(err.toString());
           sock.write(JSON.stringify({
             requestId: data.requestId,
             message: {
-              err: 'FFmpeg command failed: ' + command
+              err: err.toString()
             }
           }));
         }
@@ -90,8 +90,8 @@ net.createServer(function(sock) {
   });
 
   // Add a 'close' event handler to this instance of socket
-  sock.on('close', function(data) {
-    console.log('CLOSED: ' + sock.remoteAddress +' '+ sock.remotePort);
+  sock.on('close', function() {
+    console.log('CLOSED');
   });
 
 }).listen(PORT);
