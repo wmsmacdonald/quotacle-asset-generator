@@ -59,7 +59,10 @@ net.createServer(function(sock) {
         + ' -frames:v 1'
         + ' ' + outputFile;
 
+      var startTime = new Date();
       processQueue.add(command, function(err) {
+        console.log('Process took %d ms', new Date() - startTime);
+
         if (err) {
           console.log(err.toString());
           sock.write(JSON.stringify({
