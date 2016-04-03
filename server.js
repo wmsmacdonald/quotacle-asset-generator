@@ -2,11 +2,18 @@
 var net = require('net');
 var fs = require('fs');
 var path = require('path');
+var temp = require('temp');
+
+var processQueue = require('./process_queue');
+
 //var HOST = '73.65.72.10';
 var HOST = '127.0.0.1';
 var PORT = 5340;
 
-var acceptedApiKeys = require('./secrets/accepted_api_keys');
+var acceptedApiKeys = require('./conf/secrets/accepted_api_keys');
+var paths = require('./conf/paths');
+var ffmpegPath = require('./conf/ffmpeg_path');
+
 
 // Create a server instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection' event
@@ -41,7 +48,20 @@ net.createServer(function(sock) {
     var message = data.message;
 
     if (message.action.toString() === 'createThumbnail') {
-      ffmpeg('/usr/bin/ffmpeg  -ss ' + message.timeOffset + ' -i ' + message.file + ' -frames:v 1 output.jpg', function() {
+      var outputFile = temp.path({
+        suffix: '.jpg',
+        dir: paths.thumbnails
+      });
+
+      var command = ffmpegPath
+        + ' -ss '+ message.timeOffset
+        + ' -i ' + path.join(paths.sourceAssets, message.file)
+        + ' -frames:v 1'
+        + ' ' + outputFile;
+
+      console.log(command);
+
+      /*processQueue.add(command, function() {
         console.log('success, calling back');
         sock.write(JSON.stringify({
           requestId: data.requestId,
@@ -49,7 +69,7 @@ net.createServer(function(sock) {
             data_uri: 'testasdjflkasjkdljfklsadjlkfjalksjdklfjksdjklf'
           }
         }));
-      });
+      });*/
     }
     else if (data.action === 'createVideoClip') {
       throw 'createVideoClip not yet implemented';
